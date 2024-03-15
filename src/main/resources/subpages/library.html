@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game List</title>
+    <script src="https://unpkg.com/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        img{
+            height: 50px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            text-shadow: 2px 2px 3px rgba(100,100,100,0.6);
+        }
+
+        th {
+            margin-top: 20px;
+            height: 25px;
+        }
+
+        td {
+            border-top: 3px solid rgb(125, 189, 200);
+            padding: 15px;
+        }
+
+        .scrollable {
+            max-width: 200px;  /* Adjust based on your needs */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        button {
+            height: 35px;
+            background-color: #47b8c3;
+            color: white;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45b3c6;
+        }
+
+    </style>
+</head>
+<body>
+<div id="app">
+    <h1>MY LIBRARY</h1>
+    <table>
+        <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Publisher</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="game in games">
+            <td>
+                <img v-if="game.image" :src="game.image" alt="Game Image" height="100">
+                <span v-else> --- </span>
+            </td>
+            <td>{{ game.gname }}</td>
+            <td class = "scrollable">{{ game.description }}</td>
+            <td>{{ game.pubName }}</td>
+            <td><button v-on:click="showDetails(game)">Details</button></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+
+    axios.defaults.withCredentials = true;
+
+    window.vueApp = new Vue({
+        el: '#app',
+        data: {
+            games: [],
+        },
+        methods: {
+            showDetails(game) {
+                // Show game details, for example using alert, or better, showing in a modal
+                parent.modalCall(game);
+            },
+            clearAll(){
+                axios.get('http://localhost:8080/WebApp/library')
+                    .then(response => {
+                        this.games = response.data.map(game => {
+                            if (game.image) {game.image = "http://localhost:8080/img/" + game.image;}
+                            return game;
+                        });
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+        },
+        mounted() {
+            axios.get('http://localhost:8080/WebApp/library')
+                .then(response => {
+                    this.games = response.data.map(game => {
+                        if (game.image) {game.image = "http://localhost:8080/img/" + game.image;}
+                        return game;
+                    });
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+    });
+
+</script>
+</body>
+</html>

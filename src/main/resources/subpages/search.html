@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game List</title>
+    <script src="https://unpkg.com/vue@2.6.12/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            text-align: center;
+        }
+
+        th {
+            margin-top: 20px;
+            height: 25px;
+        }
+
+        td {
+            border-top: 3px solid rgb(125, 189, 200);
+            padding: 15px;
+            height: 50px;
+        }
+
+        .scrollable {
+            max-width: 200px;  /* Adjust based on your needs */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .delete {
+            float: right;
+        }
+
+        .delete-column {
+            width: 55px;
+        }
+
+        .search-area *{
+            float: left;
+        }
+
+        .search-area input[type="text"] {
+            width: 300px;
+            height: 35px;
+            box-sizing: border-box;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            background-color: white;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        button {
+            height: 35px;
+            background-color: #47b8c3;
+            color: white;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #45b3c6;
+        }
+
+        .search-area button {
+            margin-left: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+        }
+
+        .search-area button:hover {
+            background-color: #45a049;
+        }
+
+        img{
+            height: 50px;
+        }
+
+    </style>
+</head>
+<body>
+<div id="app">
+    <div class="search-area">
+        <input type="text" v-model="searchQuery" placeholder="Search games..."/>
+        <button v-on:click="searchGames">Search</button>
+        <button v-on:click="clearAll">Clear</button>
+    </div>
+    <button class="delete" v-on:click="toggleDeleteMode">Delete Mode</button>
+    <table>
+        <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Publisher</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr v-for="game in games">
+            <td>
+                <img v-if="game.image" :src="game.image" alt="Game Image" height="100">
+                <span v-else> --- </span>
+            </td>
+            <td>{{ game.gname }}</td>
+            <td class = "scrollable">{{ game.description }}</td>
+            <td>{{ game.pubName }}</td>
+            <td class="delete-column">
+                <button v-if="!deleteMode" v-on:click="showDetails(game)">Details</button>
+                <input v-else type="checkbox" v-model="game.selected"/>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <button class="delete" v-if="deleteMode" v-on:click="deleteSelectedGames">Delete Selected Games</button>
+</div>
+
+<script>
+    axios.defaults.withCredentials = true;
+
+    window.vueApp = new Vue({
+        el: '#app',
+        data: {
+            games: [],
+            deleteMode: false,
+            searchQuery: ''
+        },
+        methods: {
+            toggleDeleteMode() {
+                this.deleteMode = !this.deleteMode;
+                if(!this.deleteMode) {
+                    this.games.forEach(game => game.selected = false);
+                }
+            },
+            deleteSelectedGames() {
+                let selectedGames = this.games.filter(game => game.selected);
+                // Here make an API call to your server to delete the games from your database
+                const gids = selectedGames.map(game => game.gid);
+                axios.post('http://localhost:8080/WebApp/delete', gids)
+                    .then(response => {
+                        this.games = this.games.filter(game => !game.selected);
+                        parent.deletionComplete();
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                this.deleteMode = false;
+            },
+            showDetails(game) {
+                // Show game details, for example using alert, or better, showing in a modal
+                parent.modalCall(game);
+            },
+            clearAll(){
+                axios.get('http://localhost:8080/WebApp/games')
+                    .then(response => {
+                        this.games = response.data.map(game => {
+                            if (game.image) {game.image = "http://localhost:8080/img/" + game.image;}
+                            return game;
+                        });
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            searchGames() {
+                if (this.searchQuery === '') {
+                }
+                let query = new URLSearchParams();
+                query.append("query", this.searchQuery)
+                axios.post('http://localhost:8080/WebApp/games', query)
+                    .then(response => {
+                        this.games = response.data.map(game => {
+                            if (game.image) {game.image = "http://localhost:8080/img/" + game.image;}
+                            return game;
+                        });
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }
+        },
+        mounted() {
+            axios.get('http://localhost:8080/WebApp/games')
+                .then(response => {
+                    this.games = response.data.map(game => {
+                        if (game.image) {game.image = "http://localhost:8080/img/" + game.image;}
+                        return game;
+                    });
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+    });
+
+</script>
+</body>
+</html>

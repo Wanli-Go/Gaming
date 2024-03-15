@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home Page</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="css/homestyle.css" />
+</head>
+<body>
+
+  <div id = "app">
+
+
+    <!--
+    *** Modals
+    -->
+    <div v-if="showDeletionModal" class="modal">
+      <div id = "deletionModal" class="close-modal-content">
+        <span @click="closeDeletionModal" class="close-button">&times;</span>
+        <img src='img/verified.png' alt="Complete" class="status-image">
+        <p> {{ deletionMessage }} </p>
+      </div>
+    </div>
+
+    <div v-if="showModal" class="modal">
+      <div id="info-modal" class="modal-content">
+        <span @click="closeModal" class="close-button">&times;</span>
+        <button class="butt" v-if="isEditable" v-on:click="toggleEdit">Cancel</button>
+        <button class="butt" v-else v-on:click="toggleEdit">Edit</button>
+
+        <label for="file" class="butt" v-if="!createMode">Upload Image...</label>
+        <input type="file" id="file" ref="file" v-on:change="imgUpload()" accept=".jpg" style="display: none" required/>
+
+        <div v-if="game.image">
+          <img :src="game.image" alt="Game Image" height="200">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Name</label>
+          <input id = "name-input" v-if="isEditable || createMode" v-model="game.gname" type="text" placeholder="Game name" required>
+          <p v-else>{{ game.gname }}</p>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Publisher</label>
+          <select v-if="createMode" v-model="game.publisher" id = "publisher-input" required>
+            <option disabled value="">Please select one</option>
+            <option v-for="publisher in publishers" :value="publisher.uid">{{ publisher.uname }}</option>
+          </select>
+          <p v-else>{{ game.pubName }}</p>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Release Date</label>
+          <input id = "release-input" v-if="createMode" v-model="game.rdate" type="text" placeholder="yyyy-mm-dd" required>
+          <p v-else>{{ game.rdate }}</p>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Description</label>
+          <textarea v-if="isEditable || createMode" v-model="game.description" type="text" placeholder="Game description" required></textarea>
+          <p v-else>{{ game.description }}</p>
+        </div>
+
+        <button class="butt" v-if="isEditable" v-on:click="saveData" :disabled="!isEditable">Save</button>
+        <button class="butt" v-else-if="createMode" v-on:click="uploadNewGame" :disabled="!createMode">Save</button>
+      </div>
+    </div>
+
+
+    <!--
+    *** Contents
+    -->
+    <div id="sidebar">
+      <h1>ELEXONIC</h1>
+      <ul>
+        <li :class="{ 'active': selectedPage === 'library' }" @click="loadPage('library')"><img src="img/library.png" alt=""/>Library</li>
+        <li :class="{ 'active': selectedPage === 'search' }" @click="loadPage('search')"><img src="img/search.png" alt=""/>Search</li>
+        <li :class="{ 'active': selectedPage === 'account' }" @click="loadPage('account')"><img src="img/account.png" alt=""/>My Account</li>
+      </ul>
+    </div>
+    <div id="main-content">
+      <div id = "top-content">
+        <h1>You have been logged in as <span>{{ username }}</span></h1>
+        <button id = "createButton" class="butt" v-on:click="createGame">Create</button>
+      </div>
+      <iframe id = "f" v-bind:src= "innerPage"></iframe>
+    </div>
+  </div>
+</body>
+
+<script>
+
+  axios.defaults.withCredentials = true;
+
+  let app = new Vue({
+    el: '#app',
+    data: {
+      innerPage: "subpages/library.html",
+      username: '',
+      uid: '',
+      utype: -1,
+      selectedPage: 'library',  // default selected page
+
+      showModal: false,
+      game: {},
+      isEditable: false,
+
+      showDeletionModal: false,
+      deletionMessage: '',
+
+      file: '',
+
+      publishers: {},
+      createMode: false
+    },
+    methods: {
+
+      createGame(){
+        axios.get('http://localhost:8080/WebApp/create')
+                .then(response => {
+                  this.publishers = response.data;
+                  this.game = {}
+                  this.createMode = true;
+                  this.callModal({})
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+
+      uploadNewGame(){
+        if (!this.createMode) {
+          return;
+        }
+        this.closeModal();
+        let g = this.game;
+        g.gid = 0;
+        axios.post('http://localhost:8080/WebApp/create', this.game)
+                .then((response) => {
+                  console.log(response.data);
+                  this.isEditable = false;
+                  var iframe = document.getElementById('f'); // replace with your iframe's ID
+                  if (iframe) {
+                    iframe.contentWindow.vueApp.clearAll();
+                  }
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+        this.createMode = false;
+        this.callDeletionModal("Upload Successful.")
+        this.game = {};
+      },
+
+      imgUpload() {
+        this.file = this.$refs.file.files[0];
+
+        if (this.file) {
+          let formData = new FormData();
+          formData.append('uid', this.game.gid);
+          formData.append('myfile', this.file);
+
+          axios.post('http://localhost:8080/WebApp/upload', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          })
+                  .then(response => {
+                    alert("Uploading...")
+                    console.log(response);
+                    this.closeModal();
+                    this.callDeletionModal("File-Upload has been performed.")
+                  })
+                  .catch(error => {
+                    console.log(error);
+                  }).then(()=>{
+            var iframe = document.getElementById('f'); // replace with your iframe's ID
+            if (iframe) {
+              iframe.contentWindow.vueApp.clearAll();
+            }
+          })
+        }
+      },
+
+      loadPage(pageName) {
+        this.innerPage = "subpages/" + pageName + ".html";
+        this.selectedPage = pageName;
+      },
+
+      callModal(message){
+        this.game = message;
+        this.showModal = true;
+      },
+
+      callDeletionModal(message){
+        this.deletionMessage = message;
+        this.showDeletionModal = true;
+      },
+
+      closeDeletionModal() {
+        this.showDeletionModal = false;
+      },
+
+      toggleEdit() {
+        this.isEditable = !this.isEditable;
+      },
+
+      closeModal(){
+        this.showModal = false;
+        this.isEditable = false;
+        this.createMode = false;
+      },
+
+      saveData() {
+        if (!this.isEditable) {
+          return;
+        }
+        let g = this.game;
+        if(g.image){
+          g.image = g.image.replace("http://localhost:8080/img/", "")
+        }
+        axios.post('http://localhost:8080/WebApp/update', this.game)
+                .then((response) => {
+                  console.log(response.data);
+                  this.isEditable = false;
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+        if(g.image) {g.image = "http://localhost:8080/img/" + g.image;}
+        this.isEditable = false;
+      },
+    }
+  });
+
+  function modalCall(message){
+    app.callModal(message);
+  }
+
+  function deletionComplete(){
+    app.callDeletionModal("Deletion has been performed.")
+  }
+
+  axios.get('http://localhost:8080/WebApp/login')
+          .then(function (response) {
+            // handle success
+            app.username = "" + response.data;
+            let s = response.data.split("---");
+            app.username = s[0];
+            app.uid = s[1];
+            app.utype = parseInt(s[2]);
+            console.log(response.data);
+          })
+          .catch(function (error) {
+            // handle error
+            console.log(error);
+          });
+
+</script>
+
+</html>

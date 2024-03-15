@@ -1,0 +1,190 @@
+h2 {
+    margin-top: 0;
+    font-family: sans-serif;
+    text-align: center;
+    font-size: 4em;
+    color: whitesmoke;
+    text-shadow: 2px 2px 5px rgba(255,255,255,0.6);
+}
+
+
+h3 {
+    font-size: 2.6em;
+    font-family: sans-serif;
+    text-align: center;
+    color: whitesmoke;
+}
+
+@supports((text-stroke: 2px black) or (-webkit-text-stroke: 2px black)) {
+    h3 {
+        color: transparent;
+        -webkit-text-stroke: 1px whitesmoke;
+        text-stroke: 1px whitesmoke;
+        text-shadow: none;
+    }
+}
+
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+body {
+    font-weight: bold;
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient 15s ease infinite;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+form {
+    margin: auto;
+    font-size: 1.5em;
+    height: 300px;
+    width: 550px;
+    background-color: rgba(255,255,255,0.6);
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+input {
+    display: block;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+button {
+    font-size: 1em;
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(-70deg, #e85866, #e73c7e, #23a6d5, #23bcbf);
+    background-size: 600% 300%;
+    animation: gradient 15s ease infinite;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background: linear-gradient(-70deg, #bb503d, #b32b64, #1c7ba4, #1c9e89);
+    background-size: 600% 300%;
+    animation: gradient 15s ease infinite;
+}
+
+.modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    font-family: sans-serif;
+    font-size: 1em;
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 40%;
+    text-align: center;
+    animation-name: slideInDown;
+    animation-duration: 0.7s;
+}
+
+@keyframes slideInDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.status-image {
+    width: 100px;
+    height: 100px;
+}
+
+.lds-facebook {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 100%;
+}
+.lds-facebook span {
+    display: inline-block;
+    position: absolute;
+    left: 8px;
+    width: 12px;
+    background: #fff;
+    animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+}
+.lds-facebook span:nth-child(1) {
+    left: 8px;
+    animation-delay: -0.3s;
+}
+.lds-facebook span:nth-child(2) {
+    left: 32px;
+    animation-delay: -0.18s;
+}
+.lds-facebook span:nth-child(3) {
+    left: 56px;
+    animation-delay: -0.06s;
+}
+@keyframes lds-facebook {
+    0% {
+        top: 0;
+        height: 100%;
+    }
+    50%, 100% {
+        top: 20%;
+        height: 50%;
+    }
+}
+
+label {
+    font-weight: 900;
+}

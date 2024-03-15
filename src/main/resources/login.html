@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="css/loginstyle.css" />
+</head>
+<body>
+<div id="app">
+    <div v-if="showModal" class="modal">
+        <div class="modal-content">
+            <span @click="closeModal" class="close-button">&times;</span>
+            <img :src="statusImage" alt="Processing..." class="status-image">
+            <p>{{ statusMessage }}</p>
+        </div>
+    </div>
+    <h2>ELEXONIC</h2>
+    <h3>The Best Gaming Platform in the World!</h3>
+    <form @submit.prevent="submitForm">
+        <label for="username">Username:</label>
+        <input id="username" v-model="username" type="text" placeholder="Enter your graceful name, NOT your ID, please." required>
+
+        <label for="password">Password:</label>
+        <input id="password" v-model="password" type="password" placeholder="Whatever you type here, god won't see it." required>
+
+        <button type="submit">
+            <span v-show="isSubmitting" class="lds-facebook"><span></span><span></span><span></span></span>
+            <span v-show="!isSubmitting">Login</span>
+        </button>
+
+
+    </form>
+</div>
+</body>
+
+<script>
+
+    axios.defaults.withCredentials = true;
+
+    new Vue({
+        el: '#app',
+        data: {
+            //User Data
+            username: '',
+            password: '',
+
+            //Message from server
+            showModal: false,
+            statusMessage: '',
+            statusImage: '',
+
+            //Submit button
+            isSubmitting: false,
+        },
+        methods: {
+            submitForm() {
+                //alert("form submit clicked");
+                this.isSubmitting = true;
+
+                let data = new URLSearchParams();
+                data.append('username', this.username)
+                data.append('password', this.password)
+
+                axios.post('http://localhost:8080/WebApp/login', data)
+                    .then(response => {
+                        //alert(response.data);
+                        this.showModal = true;
+                        if (response.data.startsWith("OK")) {
+                            this.statusMessage = 'Login successful! You will shortly be redirected to your home page.';
+                            this.statusImage = 'img/verified.png';
+                            this.isSubmitting = false;
+
+                            window.location.href = 'home.html';
+                        } else {
+                            this.statusMessage = 'Access denied with message: ' + response.data;
+                            this.statusImage = 'img/wrong.png';
+                            this.isSubmitting = false;
+                        }
+                    })
+                    .catch(error => {
+                        this.showModal = true;
+                        this.statusMessage = 'An error occurred: ' + error;
+                        this.statusImage = 'img/wrong.png';
+                        this.isSubmitting = false;
+                    });
+            },
+            closeModal() {
+                this.showModal = false;
+            }
+        }
+    });
+
+</script>
+</html>

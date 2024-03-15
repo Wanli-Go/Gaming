@@ -1,0 +1,229 @@
+body {
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+#app {
+    width: 90%;
+    height: 90vh;
+    display: flex;
+}
+
+#sidebar {
+    width: 26%;
+    background-color: rgba(200,200,200,0.6);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar h1 {
+    font-family: sans-serif;
+    font-size: 2.5em;
+    color: whitesmoke;
+    text-shadow: 2px 2px 5px rgba(255,255,255,0.6);
+}
+
+#sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+#sidebar ul li {
+    padding: 10px 0 30px;
+    height: 26px;
+    font-size: 2em;
+    color: whitesmoke;
+    text-shadow: 1px 1px 1px rgba(255,255,255,0.6);
+    cursor: pointer;
+}
+
+
+#sidebar ul li img {
+    padding: 2px;
+    margin-top: 2px;
+    margin-right: 8px;
+    margin-left: 10px;
+    display: inline-block;
+    height: 26px;
+    width: auto;
+    filter: brightness(0) invert(90%);
+    box-shadow: 3px 3px 3px rgba(255,255,255,0.6);
+}
+
+li.active {
+    background: linear-gradient(90deg, #22afc2, #92bcca);
+    transition: color 0.3s ease;
+}
+
+#main-content {
+    width: 74%;
+    background-color: white;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 10px;
+}
+
+#main-content h1 {
+    display: inline-block;
+    float: left;
+    font-size: 1.4em;
+    color: #23bfbc;
+}
+
+#main-content h1 span{
+    font-size: 2em;
+    color: #4095c6;
+    margin-left: 15px;
+    text-shadow: 2px 2px 3px rgba(54, 125, 166, 0.6);
+}
+
+#main-content #createButton{
+    margin-top: 20px;
+    margin-right: 20px;
+    float: right;
+}
+
+iframe {
+    border: none;
+    width: 100%;
+    height: 80%;
+}
+
+.close-modal-content{
+    justify-content: center;
+    text-align: center;
+    width: 40%;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    animation: scaleUp 0.5s both;
+}
+
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    width: 40%;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
+    animation: scaleUp 0.5s both;
+}
+
+.input-label {
+    display: block;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.butt {
+    margin-right: 20px;
+    height: 35px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+}
+
+.butt:hover {
+    background-color: #45a049;
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+@keyframes scaleUp {
+    0% {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.status-image {
+    width: 100px;
+    height: 100px;
+}
+
+#info-modal img {
+    float: right;
+    width: auto;
+    height: 160px;
+    margin: 50px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+textarea {
+    height: 150px;
+}
+
+#name-input {
+    display: inline-block;
+    width: 120px;
+}
